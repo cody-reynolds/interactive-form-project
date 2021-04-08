@@ -30,8 +30,8 @@ colorSelectElement.disabled = true;
 //Allows only color choices that match the shirt selected
 designSelectElement.addEventListener('change', (e) => {
     colorSelectElement.disabled = false;
+    let activeDesign = e.target.value;
     for (let i = 0; i < colorOptionElements.length; i++) {
-        let activeDesign = e.target.value;
         let colorDesignTheme = colorOptionElements[i].getAttribute("data-theme");
         if(activeDesign === colorDesignTheme) {
             colorOptionElements[i].hidden = false;
@@ -68,14 +68,14 @@ activitiesSection.addEventListener('change', (e) => {
         if(activities[i].getAttribute('data-day-and-time') === selectedActivityTime && 
         selectedActivity.checked &&
         selectedActivity !== activities[i]) {
-        activities[i].disabled = true;
-        activities[i].parentElement.classList.add('activities-disabled');
+            activities[i].disabled = true;
+            activities[i].parentElement.classList.add('activities-disabled');
 
         //Resets activity availability if the target chkbox is unchecked and it is same timeslot as target
         } else if (!selectedActivity.checked && 
             activities[i].getAttribute('data-day-and-time') === selectedActivityTime) {
-            activities[i].disabled = false;
-            activities[i].parentElement.classList.remove('activities-disabled');
+                activities[i].disabled = false;
+                activities[i].parentElement.classList.remove('activities-disabled');
         }   
     }
 });
@@ -169,7 +169,7 @@ function emailValidator(event) {
         emailField.parentElement.classList.remove("valid");
 
         //Logic for different error messages
-        if (userEmail.value === '') {
+        if (userEmail === "") {
             emailErrorHint.innerHTML = 'Please enter an email address.';
         } else if (!userEmail.includes('@')){
             emailErrorHint.innerHTML = 'Email must contain an @ symbol';
@@ -295,6 +295,11 @@ form.addEventListener('submit', (e) => {
     zipValidator(e);
     cvvValidator(e);
     }
+
+//Reload page on submit - Thanks to:
+//https://stackoverflow.com/questions/33483960/how-to-reload-a-page-on-submit
+    setTimeout(function(){window.location.reload();},10);
+
 });
 
 nameField.addEventListener('blur', (e) =>{
