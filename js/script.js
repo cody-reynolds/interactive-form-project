@@ -2,12 +2,11 @@
 //By Cody Reynolds
 
 
-//Placing focus on name field on page load
-const nameField = document.querySelector('input[type="text"]');
+const nameField = document.getElementById('name');
 nameField.focus();
 
 
-//Hiding 'other' job role unless the user selects that option
+//Hides 'other' job role unless the user selects that option
 const jobRole = document.getElementById("title");
 const otherJobRole = document.getElementById("other-job-role");
 otherJobRole.style.display = 'none';
@@ -20,17 +19,15 @@ jobRole.addEventListener('change', (e) => {
     }
 });
 
-//T-shirt Info Section
+
+//T-SHIRT Section
 const designSelectElement = document.getElementById('design');
 const colorSelectElement = document.getElementById('color');
 const colorOptionElements = colorSelectElement.children;
 colorSelectElement.disabled = true;
 
 
-//An event listener on the T-shirt design input box.
-//Once a design is selected, loops through each of the options in the color box
-//Logs to the console which design is selected (event.target.value) 
-//and the data theme of the options in the color box.
+//Allows only color choices that match the shirt selected
 designSelectElement.addEventListener('change', (e) => {
     colorSelectElement.disabled = false;
     for (let i = 0; i < colorOptionElements.length; i++) {
@@ -47,7 +44,7 @@ designSelectElement.addEventListener('change', (e) => {
 });
 
 
-//Register for activities section
+//ACTIVITIES section
 const activitiesSection = document.getElementById('activities');
 const activities = document.querySelectorAll('#activities input');
 const totalBox = document.getElementById('activities-cost');
@@ -62,20 +59,57 @@ activitiesSection.addEventListener('change', (e) => {
         totalCost -= cost;
         totalBox.innerHTML = `Total: $${totalCost}`;
     }
+
+    //Prevents scheduling conflicts in selected activities
+    let selectedActivity = e.target;
+    let selectedActivityTime = e.target.getAttribute('data-day-and-time');
+    for (let i = 0; i < activities.length; i++) {
+
+        if(activities[i].getAttribute('data-day-and-time') === selectedActivityTime && 
+        selectedActivity.checked &&
+        selectedActivity !== activities[i]) {
+        activities[i].disabled = true;
+        activities[i].parentElement.classList.add('activities-disabled');
+
+        //Resets activity availability if the target chkbox is unchecked and it is same timeslot as target
+        } else if (!selectedActivity.checked && 
+            activities[i].getAttribute('data-day-and-time') === selectedActivityTime) {
+            activities[i].disabled = false;
+            activities[i].parentElement.classList.remove('activities-disabled');
+        }   
+    }
 });
 
 
-//Payment Section
+//Accessibility feature - makes the active checkbox activity more visible
+for (i = 0; i < activities.length; i++) {
+    let parentLabel = activities[i].parentElement;
+
+    activities[i].addEventListener('focus', () =>{
+        parentLabel.classList.add('focus');
+    })
+
+    activities[i].addEventListener('blur', () =>{
+        parentLabel.classList.remove('focus');
+    })
+};
+
+
+//PAYMENT Section
 const paymentBox = document.getElementById('payment');
 const paymentOptions = paymentBox.children;
 const creditCard = document.getElementById('credit-card');
 const paypal = document.getElementById('paypal');
 const bitcoin = document.getElementById('bitcoin');
 
+
 paypal.style.display = 'none';
 bitcoin.style.display = 'none';
 
+
+//Makes credit card the default payment option
 paymentOptions[1].selected = true;
+
 
 paymentBox.addEventListener('change', (e) => {
     let selectedPaymentType = e.target.value;
@@ -95,14 +129,13 @@ paymentBox.addEventListener('change', (e) => {
 });
 
 
-//Form validation variables
+//Form Validation
 const emailField = document.getElementById('email');
 const cardNumberField = document.getElementById('cc-num');
 const zipCodeField = document.getElementById('zip');
 const cvvField = document.getElementById('cvv');
 const form = document.querySelector('form');
 
-//FORM VALIDATION
 
 //Helper functions
 function nameValidator(event) {
@@ -129,18 +162,29 @@ function emailValidator(event) {
     let userEmail = emailField.value;
     let emailPattern = /^[^@]+@[^@.]+\.[a-z]+$/i;
     let isEmailValid = emailPattern.test(userEmail);
+    let emailErrorHint = emailField.parentElement.lastElementChild;
 
     if (!isEmailValid){
         emailField.parentElement.classList.add("not-valid");
         emailField.parentElement.classList.remove("valid");
-        emailField.parentElement.lastElementChild.style.display = 'block';
+
+        //Logic for different error messages
+        if (userEmail.value === '') {
+            emailErrorHint.innerHTML = 'Please enter an email address.';
+        } else if (!userEmail.includes('@')){
+            emailErrorHint.innerHTML = 'Email must contain an @ symbol';
+        } else {
+        emailErrorHint.innerHTML = 'Email must follow correct format (ex: name@example.com)';
+        }
+
+        emailErrorHint.style.display = 'block';
         event.preventDefault();
+
     } else if (isEmailValid){
         emailField.parentElement.classList.add("valid");
         emailField.parentElement.classList.remove("not-valid");
-        emailField.parentElement.lastElementChild.style.display = 'none';
+        emailErrorHint.style.display = 'none';
     }
-
     return isEmailValid;
 }
 
@@ -164,18 +208,39 @@ function activitiesValidator(event) {
 
 function cardNumberValidator(event) {
     let userCardNumber = cardNumberField.value;
-    let cardNumberPattern = /\d{13,16}/
+    let cardNumberPattern = /^\d{13,16}$/
     let isCardNumberValid = cardNumberPattern.test(userCardNumber);
+    let cardNumberErrorHint = cardNumberField.parentElement.lastElementChild;
+
+    //RegEx from StackOverflow containing one or more letters or special characters
+    let cardAlpha = /[a-z!@#\$%\^&*\)\(+=._-]+/i
+    let cardAlphaTest = cardAlpha.test(userCardNumber);
+
 
     if (!isCardNumberValid){
         cardNumberField.parentElement.classList.add("not-valid");
         cardNumberField.parentElement.classList.remove("valid");
-        cardNumberField.parentElement.lastElementChild.style.display = 'block';
+        cardNumberErrorHint.style.display = 'block';
+
+        //Logic for different error messages
+        if(userCardNumber === ''){
+            cardNumberErrorHint.innerHTML = "Card number is required"
+        } else if (cardAlphaTest) {
+            cardNumberErrorHint.innerHTML = "Please enter numbers only"
+        } else if (userCardNumber.includes(' ')) {
+            cardNumberErrorHint.innerHTML = "Card number cannot contain any spaces"
+        } else if (userCardNumber.length < 13) {
+            cardNumberErrorHint.innerHTML = "Card number must contain at least 13 digits"
+        } else if (userCardNumber.length > 16) {
+            cardNumberErrorHint.innerHTML = "Card number must contain a maximum of 16 digits"
+        }
+
         event.preventDefault();
+
     } else if (isCardNumberValid) {
         cardNumberField.parentElement.classList.add("valid");
         cardNumberField.parentElement.classList.remove("not-valid");
-        cardNumberField.parentElement.lastElementChild.style.display = 'none';
+        cardNumberErrorHint.style.display = 'none';
     }
     return isCardNumberValid;
 }
@@ -218,13 +283,13 @@ function cvvValidator(event) {
     return isCvvValid;
 }
 
-//Event listener on submit button, validates all of user's input
+
+//Validation Listeners
 form.addEventListener('submit', (e) => {
     nameValidator(e);
     emailValidator(e);
     activitiesValidator(e);
 
-    //Only applicable if the user selects credit card as payment method
     if (paymentOptions[1].selected) {
     cardNumberValidator(e);
     zipValidator(e);
@@ -232,17 +297,24 @@ form.addEventListener('submit', (e) => {
     }
 });
 
-//ACCESSIBILITY
+nameField.addEventListener('blur', (e) =>{
+    nameValidator(e);
+});
 
-//Makes the active checkbox activities more visible as the user tabs through options
-for (i = 0; i < activities.length; i++) {
-    let parentLabel = activities[i].parentElement;
+emailField.addEventListener('blur', (e) =>{
+    emailValidator(e);
+});
 
-    activities[i].addEventListener('focus', () =>{
-        parentLabel.classList.add('focus');
-    })
 
-    activities[i].addEventListener('blur', () =>{
-        parentLabel.classList.remove('focus');
-    })
-};
+cardNumberField.addEventListener('keyup', (e) => {
+    cardNumberValidator(e);
+});
+
+
+zipCodeField.addEventListener('keyup', (e) =>{
+    zipValidator(e);
+});
+
+cvvField.addEventListener('keyup', (e) =>{
+    cvvValidator(e);
+});

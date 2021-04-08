@@ -420,6 +420,10 @@ button:hover {
   margin-top: 10px;
 }
 
+.activities-disabled  {
+  background-color: rgb(179, 179, 179) !important;
+}
+
 /* ================================= 
   Payment section styles
 ==================================== */
