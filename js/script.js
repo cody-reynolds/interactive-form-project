@@ -105,77 +105,131 @@ const form = document.querySelector('form');
 //FORM VALIDATION
 
 //Helper functions
-function nameValidator() {
+function nameValidator(event) {
     let userName = nameField.value;
     let namePattern = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/;
     let isNameValid = namePattern.test(userName);
-    return isNameValid;
+
+    if (!isNameValid){
+        nameField.parentElement.classList.add("not-valid");
+        nameField.parentElement.classList.remove("valid");
+        nameField.parentElement.lastElementChild.style.display = 'block';
+        event.preventDefault();
+
+    } else if (isNameValid){
+        nameField.parentElement.classList.add("valid");
+        nameField.parentElement.classList.remove("not-valid");
+        nameField.parentElement.lastElementChild.style.display = 'none';
     }
+    return isNameValid;
+}
 
 
-function emailValidator() {
+function emailValidator(event) {
     let userEmail = emailField.value;
     let emailPattern = /^[^@]+@[^@.]+\.[a-z]+$/i;
     let isEmailValid = emailPattern.test(userEmail);
+
+    if (!isEmailValid){
+        emailField.parentElement.classList.add("not-valid");
+        emailField.parentElement.classList.remove("valid");
+        emailField.parentElement.lastElementChild.style.display = 'block';
+        event.preventDefault();
+    } else if (isEmailValid){
+        emailField.parentElement.classList.add("valid");
+        emailField.parentElement.classList.remove("not-valid");
+        emailField.parentElement.lastElementChild.style.display = 'none';
+    }
+
     return isEmailValid;
 }
 
 
-function activitiesValidator() {
+function activitiesValidator(event) {
     let areActivitiesValid = (totalCost > 0);
+
+    if (!areActivitiesValid){
+        activitiesSection.classList.add("not-valid");
+        activitiesSection.classList.remove("valid");
+        activitiesSection.lastElementChild.style.display = 'block';
+        event.preventDefault();
+    } else if (areActivitiesValid){
+        activitiesSection.classList.add("valid");
+        activitiesSection.classList.remove("not-valid");
+        activitiesSection.lastElementChild.style.display = 'none';
+    }
     return areActivitiesValid;
 }
 
 
-function cardNumberValidator() {
+function cardNumberValidator(event) {
     let userCardNumber = cardNumberField.value;
     let cardNumberPattern = /\d{13,16}/
     let isCardNumberValid = cardNumberPattern.test(userCardNumber);
+
+    if (!isCardNumberValid){
+        cardNumberField.parentElement.classList.add("not-valid");
+        cardNumberField.parentElement.classList.remove("valid");
+        cardNumberField.parentElement.lastElementChild.style.display = 'block';
+        event.preventDefault();
+    } else if (isCardNumberValid) {
+        cardNumberField.parentElement.classList.add("valid");
+        cardNumberField.parentElement.classList.remove("not-valid");
+        cardNumberField.parentElement.lastElementChild.style.display = 'none';
+    }
     return isCardNumberValid;
 }
 
 
-function zipValidator() {
+function zipValidator(event) {
     let userZip = zipCodeField.value;
-    let zipPattern = /\d{5}$/;
+    let zipPattern = /^\d{5}$/;
     let isZipValid = zipPattern.test(userZip);
+
+    if (!isZipValid){
+        zipCodeField.parentElement.classList.add("not-valid");
+        zipCodeField.parentElement.classList.remove("valid");
+        zipCodeField.parentElement.lastElementChild.style.display = 'block';
+        event.preventDefault();
+    } else if (isZipValid){
+        zipCodeField.parentElement.classList.add("valid");
+        zipCodeField.parentElement.classList.remove("not-valid");
+        zipCodeField.parentElement.lastElementChild.style.display = 'none';
+    }
     return isZipValid;
 }
 
 
-function cvvValidator() {
+function cvvValidator(event) {
     let userCvv = cvvField.value;
-    let cvvPattern = /\d{3}$/;
+    let cvvPattern = /^\d{3}$/;
     let isCvvValid = cvvPattern.test(userCvv);
+
+    if (!isCvvValid){
+        cvvField.parentElement.classList.add("not-valid");
+        cvvField.parentElement.classList.remove("valid");
+        cvvField.parentElement.lastElementChild.style.display = 'block';
+        event.preventDefault();
+    } else if (isCvvValid){
+        cvvField.parentElement.classList.add("valid");
+        cvvField.parentElement.classList.remove("not-valid");
+        cvvField.parentElement.lastElementChild.style.display = 'none';
+    }
     return isCvvValid;
 }
 
 //Event listener on submit button, validates all of user's input
 form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    activitiesValidator();
-    
-    if (!nameValidator() ||
-        !emailValidator() ||
-        !activitiesValidator()) {
-            e.preventDefault();
-    }
+    nameValidator(e);
+    emailValidator(e);
+    activitiesValidator(e);
 
     //Only applicable if the user selects credit card as payment method
-    if(paymentOptions[1].selected === true) {
-        if(!cardNumberValidator() ||
-           !zipValidator() ||
-           !cvvValidator()) {
-               e.preventDefault();
-           }
+    if (paymentOptions[1].selected) {
+    cardNumberValidator(e);
+    zipValidator(e);
+    cvvValidator(e);
     }
-
-    nameHint();
-    emailHint();
-    activitiesHint();
-    cardNumberHint();
-    zipHint();
-    cvvHint();
 });
 
 //ACCESSIBILITY
@@ -192,76 +246,3 @@ for (i = 0; i < activities.length; i++) {
         parentLabel.classList.remove('focus');
     })
 };
-
-
-function nameHint() {
-    if(!nameValidator()){
-        nameField.parentElement.classList.add("not-valid");
-        nameField.parentElement.classList.remove("valid");
-        nameField.parentElement.lastElementChild.style.display = 'block';
-    } else if (nameValidator()){
-        nameField.parentElement.classList.add("valid");
-        nameField.parentElement.classList.remove("not-valid");
-        nameField.parentElement.lastElementChild.style.display = 'none';
-    }
-}
-
-function emailHint() {
-    if(!emailValidator()){
-        emailField.parentElement.classList.add("not-valid");
-        emailField.parentElement.classList.remove("valid");
-        emailField.parentElement.lastElementChild.style.display = 'block';
-    } else if (nameValidator()){
-        emailField.parentElement.classList.add("valid");
-        emailField.parentElement.classList.remove("not-valid");
-        emailField.parentElement.lastElementChild.style.display = 'none';
-    }
-}
-
-function activitiesHint() {
-    if(!activitiesValidator()){
-        activitiesSection.classList.add("not-valid");
-        activitiesSection.classList.remove("valid");
-        activitiesSection.lastElementChild.style.display = 'block';
-    } else if (nameValidator()){
-        activitiesSection.classList.add("valid");
-        activitiesSection.classList.remove("not-valid");
-        activitiesSection.lastElementChild.style.display = 'none';
-    }
-}
-
-function cardNumberHint() {
-    if(!cardNumberValidator()){
-        cardNumberField.parentElement.classList.add("not-valid");
-        cardNumberField.parentElement.classList.remove("valid");
-        cardNumberField.parentElement.lastElementChild.style.display = 'block';
-    } else if (cardNumberValidator()){
-        cardNumberField.parentElement.classList.add("valid");
-        cardNumberField.parentElement.classList.remove("not-valid");
-        cardNumberField.parentElement.lastElementChild.style.display = 'none';
-    }
-}
-
-function zipHint() {
-    if(!zipValidator()){
-        zipCodeField.parentElement.classList.add("not-valid");
-        zipCodeField.parentElement.classList.remove("valid");
-        zipCodeField.parentElement.lastElementChild.style.display = 'block';
-    } else if (zipValidator()){
-        zipCodeField.parentElement.classList.add("valid");
-        zipCodeField.parentElement.classList.remove("not-valid");
-        zipCodeField.parentElement.lastElementChild.style.display = 'none';
-    }
-}
-
-function cvvHint() {
-    if(!cvvValidator()){
-        cvvField.parentElement.classList.add("not-valid");
-        cvvField.parentElement.classList.remove("valid");
-        cvvField.parentElement.lastElementChild.style.display = 'block';
-    } else if (cvvValidator()){
-        cvvField.parentElement.classList.add("valid");
-        cvvField.parentElement.classList.remove("not-valid");
-        cvvField.parentElement.lastElementChild.style.display = 'none';
-    }
-}
