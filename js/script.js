@@ -286,20 +286,20 @@ function cvvValidator(event) {
 
 //Validation Listeners
 form.addEventListener('submit', (e) => {
-    nameValidator(e);
-    emailValidator(e);
-    activitiesValidator(e);
+    let validationPassed = true
 
+    validationPassed = nameValidator(e) && emailValidator(e) && activitiesValidator(e);
+    
     if (paymentOptions[1].selected) {
-    cardNumberValidator(e);
-    zipValidator(e);
-    cvvValidator(e);
+        validationPassed = validationPassed && cardNumberValidator(e) && zipValidator(e) && cvvValidator(e);
     }
 
 //Reload page on submit - Thanks to:
 //https://stackoverflow.com/questions/33483960/how-to-reload-a-page-on-submit
-    setTimeout(function(){window.location.reload();},10);
-
+    
+    if(validationPassed){
+        setTimeout(function(){window.location.reload();},10);
+    }
 });
 
 nameField.addEventListener('blur', (e) =>{
