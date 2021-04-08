@@ -27,10 +27,10 @@ const colorOptionElements = colorSelectElement.children;
 colorSelectElement.disabled = true;
 
 
-//An event listener on the T-shirt design input box. Listens for changes.
-//Once a design is selected, a loop begins, looping through each of the options in the color box
-//Logs to the console which design is selected (event.target.value) and the data theme of the
-//Options in the color box.
+//An event listener on the T-shirt design input box.
+//Once a design is selected, loops through each of the options in the color box
+//Logs to the console which design is selected (event.target.value) 
+//and the data theme of the options in the color box.
 designSelectElement.addEventListener('change', (e) => {
     colorSelectElement.disabled = false;
     for (let i = 0; i < colorOptionElements.length; i++) {
@@ -79,7 +79,6 @@ paymentOptions[1].selected = true;
 
 paymentBox.addEventListener('change', (e) => {
     let selectedPaymentType = e.target.value;
-    console.log(selectedPaymentType);
     if (selectedPaymentType === 'paypal') {
         creditCard.style.display = 'none';
         bitcoin.style.display = 'none';
@@ -96,80 +95,173 @@ paymentBox.addEventListener('change', (e) => {
 });
 
 
-//Form input validation
+//Form validation variables
 const emailField = document.getElementById('email');
 const cardNumberField = document.getElementById('cc-num');
 const zipCodeField = document.getElementById('zip');
 const cvvField = document.getElementById('cvv');
 const form = document.querySelector('form');
 
+//FORM VALIDATION
 
-//Validation helper functions
-//In this section
-
-function nameValidation() {
+//Helper functions
+function nameValidator() {
     let userName = nameField.value;
-    let namePattern = /[a-z]+/i;
-    let nameTest = namePattern.test(userName);
-    return nameTest;
+    let namePattern = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/;
+    let isNameValid = namePattern.test(userName);
+    return isNameValid;
     }
 
 
-function emailValidation() {
+function emailValidator() {
     let userEmail = emailField.value;
-    let emailPattern = /\w+@\w+\.\w+/i;
-    let emailTest = emailPattern.test(userEmail);
-    return emailTest;
+    let emailPattern = /^[^@]+@[^@.]+\.[a-z]+$/i;
+    let isEmailValid = emailPattern.test(userEmail);
+    return isEmailValid;
 }
 
 
-function checkBoxCount() {
-    let checkBoxCounter = 0;
-    for (i = 0; i < activities.length; i++) {
-        if (activities[i].checked) {
-            checkBoxCounter += 1;
-        }
-    }
-    return checkBoxCounter;
+function activitiesValidator() {
+    let areActivitiesValid = (totalCost > 0);
+    return areActivitiesValid;
 }
 
 
-function cardNumberValidation() {
+function cardNumberValidator() {
     let userCardNumber = cardNumberField.value;
     let cardNumberPattern = /\d{13,16}/
-    let cardNumberTest = cardNumberPattern.test(userCardNumber);
-    return cardNumberTest;
+    let isCardNumberValid = cardNumberPattern.test(userCardNumber);
+    return isCardNumberValid;
 }
 
 
-function zipValidation() {
+function zipValidator() {
     let userZip = zipCodeField.value;
     let zipPattern = /\d{5}$/;
-    let zipTest = zipPattern.test(userZip);
-    return zipTest;
+    let isZipValid = zipPattern.test(userZip);
+    return isZipValid;
 }
 
 
-function cvvValidation() {
+function cvvValidator() {
     let userCvv = cvvField.value;
     let cvvPattern = /\d{3}$/;
-    let cvvTest = cvvPattern.test(userCvv);
-    return cvvTest;
+    let isCvvValid = cvvPattern.test(userCvv);
+    return isCvvValid;
 }
 
-
+//Event listener on submit button, validates all of user's input
 form.addEventListener('submit', (e) => {
-    if (nameValidation() === false ||
-        emailValidation() === false ||
-        checkBoxCount() === 0) {
+    e.preventDefault();
+    activitiesValidator();
+    
+    if (!nameValidator() ||
+        !emailValidator() ||
+        !activitiesValidator()) {
             e.preventDefault();
     }
 
+    //Only applicable if the user selects credit card as payment method
     if(paymentOptions[1].selected === true) {
-        if(cardNumberValidation() === false ||
-           zipValidation() === false ||
-           cvvValidation() === false) {
+        if(!cardNumberValidator() ||
+           !zipValidator() ||
+           !cvvValidator()) {
                e.preventDefault();
            }
-}
+    }
+
+    nameHint();
+    emailHint();
+    activitiesHint();
+    cardNumberHint();
+    zipHint();
+    cvvHint();
 });
+
+//ACCESSIBILITY
+
+//Makes the active checkbox activities more visible as the user tabs through options
+for (i = 0; i < activities.length; i++) {
+    let parentLabel = activities[i].parentElement;
+
+    activities[i].addEventListener('focus', () =>{
+        parentLabel.classList.add('focus');
+    })
+
+    activities[i].addEventListener('blur', () =>{
+        parentLabel.classList.remove('focus');
+    })
+};
+
+
+function nameHint() {
+    if(!nameValidator()){
+        nameField.parentElement.classList.add("not-valid");
+        nameField.parentElement.classList.remove("valid");
+        nameField.parentElement.lastElementChild.style.display = 'block';
+    } else if (nameValidator()){
+        nameField.parentElement.classList.add("valid");
+        nameField.parentElement.classList.remove("not-valid");
+        nameField.parentElement.lastElementChild.style.display = 'none';
+    }
+}
+
+function emailHint() {
+    if(!emailValidator()){
+        emailField.parentElement.classList.add("not-valid");
+        emailField.parentElement.classList.remove("valid");
+        emailField.parentElement.lastElementChild.style.display = 'block';
+    } else if (nameValidator()){
+        emailField.parentElement.classList.add("valid");
+        emailField.parentElement.classList.remove("not-valid");
+        emailField.parentElement.lastElementChild.style.display = 'none';
+    }
+}
+
+function activitiesHint() {
+    if(!activitiesValidator()){
+        activitiesSection.classList.add("not-valid");
+        activitiesSection.classList.remove("valid");
+        activitiesSection.lastElementChild.style.display = 'block';
+    } else if (nameValidator()){
+        activitiesSection.classList.add("valid");
+        activitiesSection.classList.remove("not-valid");
+        activitiesSection.lastElementChild.style.display = 'none';
+    }
+}
+
+function cardNumberHint() {
+    if(!cardNumberValidator()){
+        cardNumberField.parentElement.classList.add("not-valid");
+        cardNumberField.parentElement.classList.remove("valid");
+        cardNumberField.parentElement.lastElementChild.style.display = 'block';
+    } else if (cardNumberValidator()){
+        cardNumberField.parentElement.classList.add("valid");
+        cardNumberField.parentElement.classList.remove("not-valid");
+        cardNumberField.parentElement.lastElementChild.style.display = 'none';
+    }
+}
+
+function zipHint() {
+    if(!zipValidator()){
+        zipCodeField.parentElement.classList.add("not-valid");
+        zipCodeField.parentElement.classList.remove("valid");
+        zipCodeField.parentElement.lastElementChild.style.display = 'block';
+    } else if (zipValidator()){
+        zipCodeField.parentElement.classList.add("valid");
+        zipCodeField.parentElement.classList.remove("not-valid");
+        zipCodeField.parentElement.lastElementChild.style.display = 'none';
+    }
+}
+
+function cvvHint() {
+    if(!cvvValidator()){
+        cvvField.parentElement.classList.add("not-valid");
+        cvvField.parentElement.classList.remove("valid");
+        cvvField.parentElement.lastElementChild.style.display = 'block';
+    } else if (cvvValidator()){
+        cvvField.parentElement.classList.add("valid");
+        cvvField.parentElement.classList.remove("not-valid");
+        cvvField.parentElement.lastElementChild.style.display = 'none';
+    }
+}
