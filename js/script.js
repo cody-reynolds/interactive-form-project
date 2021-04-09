@@ -288,6 +288,16 @@ function cvvValidator(event) {
 form.addEventListener('submit', (e) => {
     let validationPassed = true
 
+    nameValidator(e);
+    emailValidator(e);
+    activitiesValidator(e);
+
+    if(paymentOptions[1].selected){
+        cardNumberValidator(e);
+        zipValidator(e);
+        cvvValidator(e);
+    }
+
     validationPassed = nameValidator(e) && emailValidator(e) && activitiesValidator(e);
     
     if (paymentOptions[1].selected) {
